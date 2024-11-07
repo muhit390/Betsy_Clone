@@ -54,7 +54,7 @@ def get_user(id):
 
 
 
-# Routes for Product Model
+# Routes for Product Modell
 
 # Create a new product
 @app.route('/products', methods=['POST'])
