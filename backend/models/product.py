@@ -2,7 +2,7 @@ from app import db
 
 class Product(db.Model):
     __tablename__ = 'products'
-    id = db.Column(db.BigInteger, primary_key=True)
+    id = db.Column(db.Integer, primary_key=True)
     user_id = db.Column(db.BigInteger, db.ForeignKey('users.id'), nullable=False)
     name = db.Column(db.Text, nullable=False)
     category = db.Column(db.Text)
