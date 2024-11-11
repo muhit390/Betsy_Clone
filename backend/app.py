@@ -27,22 +27,22 @@ def home():
 
 
 # Create a new user
-@app.route('/users', methods=['POST'])
-def create_user():
-    try:
-        data = request.get_json()
-        new_user = User(
-            first_name=data['first_name'],
-            last_name=data['last_name'],
-            username=data['username'],
-            hashed_password=data['hashed_password']
-        )
-        db.session.add(new_user)
-        db.session.commit()
-        return jsonify({"message": "User created successfully"}), 201
-    except Exception as e:
-        db.session.rollback()
-        return jsonify({"error": str(e)}), 500
+# @app.route('/users', methods=['POST'])
+# def create_user():
+#     try:
+#         data = request.get_json()
+#         new_user = User(
+#             first_name=data['first_name'],
+#             last_name=data['last_name'],
+#             username=data['username'],
+#             hashed_password=data['hashed_password']
+#         )
+#         db.session.add(new_user)
+#         db.session.commit()
+#         return jsonify({"message": "User created successfully"}), 201
+#     except Exception as e:
+#         db.session.rollback()
+#         return jsonify({"error": str(e)}), 500
 
 # Get all users
 @app.route('/users', methods=['GET'])
