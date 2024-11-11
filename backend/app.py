@@ -26,16 +26,20 @@ def home():
 
 @app.route('/users', methods=['POST'])
 def create_user():
-    data = request.get_json()
-    new_user = User(
-        first_name=data['first_name'],
-        last_name=data['last_name'],
-        username=data['username'],
-        hashed_password=data['hashed_password']
-    )
-    db.session.add(new_user)
-    db.session.commit()
-    return jsonify({"message": "User created successfully"}), 201
+    try:
+        data = request.get_json()
+        new_user = User(
+            first_name=data['first_name'],
+            last_name=data['last_name'],
+            username=data['username'],
+            hashed_password=data['hashed_password']
+        )
+        db.session.add(new_user)
+        db.session.commit()
+        return jsonify({"message": "User created successfully"}), 201
+    except Exception as e:
+        db.session.rollback()
+        return jsonify({"error": str(e)}), 500
 
 # Get all users
 @app.route('/users', methods=['GET'])
@@ -202,4 +206,4 @@ def get_favorites(user_id):
 
 
 if __name__ == '__main__':
-    app.run(debug=True)
+    app.run(host='0.0.0.0', port=5000 ,debug=True)
