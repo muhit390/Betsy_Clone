@@ -1,11 +1,13 @@
 from flask import Flask, jsonify, request
 from config import Config
 from extensions import db , migrate
+from flask_bcrypt import Bcrypt
 
 from models import User, Product, Review, ProductImage, ShoppingCart, Favorite
 
 app = Flask(__name__)
 app.config.from_object(Config)
+bcrypt = Bcrypt(app)
 
 
 db.init_app(app)
@@ -22,8 +24,9 @@ def home():
 
 # Routes for User Model
 
-# Create a new user
 
+
+# Create a new user
 @app.route('/users', methods=['POST'])
 def create_user():
     try:
