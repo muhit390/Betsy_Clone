@@ -1,4 +1,4 @@
-from extensions import db
+from backend.app.extensions import db
 from .user import User
 from .product import Product
 from .review import Review
