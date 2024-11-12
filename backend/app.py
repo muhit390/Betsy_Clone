@@ -246,4 +246,4 @@ def remove_from_favorites(user_id, product_id):
     return jsonify({"message": "Product not found in favorites"}), 404
 
 if __name__ == '__main__':
-    app
+    app.run(debug=True)
