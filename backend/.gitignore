@@ -1,0 +1,22 @@
+# Ignore Python cache files
+__pycache__/
+*.pyc
+
+# Ignore virtual environment
+.venv/
+.vscode/
+
+# Ignore SQLite database file
+instance/*.db
+
+# Ignore configuration files with sensitive data
+config.py
+
+# Ignore Alembic migration cache and temporary files
+migrations/versions/*.pyc
+migrations/__pycache__/
+
+# Ignore IDE/editor settings
+*.log
+.DS_Store
+.env
