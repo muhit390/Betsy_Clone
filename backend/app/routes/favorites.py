@@ -3,7 +3,6 @@ from app.models import Favorite, Product, db
 
 favorites_bp = Blueprint('favorites', __name__)
 
-# Add a product to user's favorites
 @favorites_bp.route('/users/<int:user_id>/favorites', methods=['POST'])
 def add_to_favorites(user_id):
     data = request.get_json()
@@ -15,7 +14,6 @@ def add_to_favorites(user_id):
     db.session.commit()
     return jsonify({"message": "Product added to favorites"}), 201
 
-# Get all favorite products of a user
 @favorites_bp.route('/users/<int:user_id>/favorites', methods=['GET'])
 def get_favorites(user_id):
     favorites = Favorite.query.filter_by(user_id=user_id).all()
@@ -30,7 +28,6 @@ def get_favorites(user_id):
             })
     return jsonify(favorite_products)
 
-# Remove a product from the user's favorites
 @favorites_bp.route('/users/<int:user_id>/favorites/<int:product_id>', methods=['DELETE'])
 def remove_from_favorites(user_id, product_id):
     favorite = Favorite.query.filter_by(user_id=user_id, product_id=product_id).first()
