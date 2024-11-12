@@ -1,7 +1,7 @@
 from flask_wtf import FlaskForm
 from wtforms import StringField, PasswordField
 from wtforms.validators import DataRequired, ValidationError, Length
-from models.user import User
+from app.models import User
 
 def username_check(form, field):
     username = field.data
