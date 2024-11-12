@@ -1,29 +1,23 @@
 from flask import Flask, jsonify, request
 from config import Config
-from extensions import db , migrate
-
+from extensions import db, migrate
 from models import User, Product, Review, ProductImage, ShoppingCart, Favorite
 
 app = Flask(__name__)
 app.config.from_object(Config)
 
-
+# Initialize extensions
 db.init_app(app)
 migrate.init_app(app, db)
-
-
-
 
 # Home route
 @app.route('/')
 def home():
     return jsonify({"message": "Welcome to the Etsy Clone!"})
 
-
 # Routes for User Model
 
 # Create a new user
-
 @app.route('/users', methods=['POST'])
 def create_user():
     data = request.get_json()
@@ -50,9 +44,6 @@ def get_user(id):
     if user:
         return jsonify({"id": user.id, "username": user.username, "first_name": user.first_name, "last_name": user.last_name})
     return jsonify({"message": "User not found"}), 404
-
-
-
 
 # Routes for Product Model
 
@@ -93,12 +84,32 @@ def get_product(id):
         })
     return jsonify({"message": "Product not found"}), 404
 
+# Update a product
+@app.route('/products/<int:id>', methods=['PUT'])
+def update_product(id):
+    data = request.get_json()
+    product = Product.query.get(id)
+    if product:
+        product.name = data.get('name', product.name)
+        product.category = data.get('category', product.category)
+        product.description = data.get('description', product.description)
+        product.price = data.get('price', product.price)
+        product.quantity = data.get('quantity', product.quantity)
+        db.session.commit()
+        return jsonify({"message": "Product updated successfully"})
+    return jsonify({"message": "Product not found"}), 404
 
-
+# Delete a product
+@app.route('/products/<int:id>', methods=['DELETE'])
+def delete_product(id):
+    product = Product.query.get(id)
+    if product:
+        db.session.delete(product)
+        db.session.commit()
+        return jsonify({"message": "Product deleted successfully"})
+    return jsonify({"message": "Product not found"}), 404
 
 # Routes for Review Model
-
-
 
 # Add a review to a product
 @app.route('/products/<int:product_id>/reviews', methods=['POST'])
@@ -120,12 +131,29 @@ def get_reviews(product_id):
     reviews = Review.query.filter_by(product_id=product_id).all()
     return jsonify([{"id": r.id, "user_id": r.user_id, "review": r.review, "rating": r.rating} for r in reviews])
 
+# Update a review
+@app.route('/products/<int:product_id>/reviews/<int:review_id>', methods=['PUT'])
+def update_review(product_id, review_id):
+    data = request.get_json()
+    review = Review.query.filter_by(id=review_id, product_id=product_id).first()
+    if review:
+        review.review = data.get('review', review.review)
+        review.rating = data.get('rating', review.rating)
+        db.session.commit()
+        return jsonify({"message": "Review updated successfully"})
+    return jsonify({"message": "Review not found"}), 404
 
-
+# Delete a review
+@app.route('/products/<int:product_id>/reviews/<int:review_id>', methods=['DELETE'])
+def delete_review(product_id, review_id):
+    review = Review.query.filter_by(id=review_id, product_id=product_id).first()
+    if review:
+        db.session.delete(review)
+        db.session.commit()
+        return jsonify({"message": "Review deleted successfully"})
+    return jsonify({"message": "Review not found"}), 404
 
 # Routes for ProductImage Model
-
-
 
 # Add an image to a product
 @app.route('/products/<int:product_id>/images', methods=['POST'])
@@ -146,13 +174,7 @@ def get_product_images(product_id):
     images = ProductImage.query.filter_by(product_id=product_id).all()
     return jsonify([{"id": img.id, "name": img.name, "preview_image": img.preview_image} for img in images])
 
-
-
-
 # Routes for ShoppingCart Model
-
-
-
 
 # Add a product to a user's shopping cart
 @app.route('/users/<int:user_id>/cart', methods=['POST'])
@@ -172,13 +194,28 @@ def get_cart(user_id):
     cart_items = ShoppingCart.query.filter_by(user_id=user_id).all()
     return jsonify([{"product_id": item.product_id} for item in cart_items])
 
+# Remove a product from the shopping cart
+@app.route('/users/<int:user_id>/cart/<int:product_id>', methods=['DELETE'])
+def remove_from_cart(user_id, product_id):
+    cart_item = ShoppingCart.query.filter_by(user_id=user_id, product_id=product_id).first()
+    if cart_item:
+        db.session.delete(cart_item)
+        db.session.commit()
+        return jsonify({"message": "Product removed from cart"})
+    return jsonify({"message": "Product not found in cart"}), 404
 
-
-
+# "Transaction" to complete the purchase
+@app.route('/users/<int:user_id>/cart/checkout', methods=['POST'])
+def checkout(user_id):
+    cart_items = ShoppingCart.query.filter_by(user_id=user_id).all()
+    if cart_items:
+        for item in cart_items:
+            db.session.delete(item)
+        db.session.commit()
+        return jsonify({"message": "Purchase completed successfully"})
+    return jsonify({"message": "No items in cart to checkout"}), 404
 
 # Routes for Favorite Model
-
-
 
 # Add a product to user's favorites
 @app.route('/users/<int:user_id>/favorites', methods=['POST'])
@@ -198,8 +235,15 @@ def get_favorites(user_id):
     favorites = Favorite.query.filter_by(user_id=user_id).all()
     return jsonify([{"product_id": fav.product_id} for fav in favorites])
 
-
-
+# Remove a product from the user's favorites
+@app.route('/users/<int:user_id>/favorites/<int:product_id>', methods=['DELETE'])
+def remove_from_favorites(user_id, product_id):
+    favorite = Favorite.query.filter_by(user_id=user_id, product_id=product_id).first()
+    if favorite:
+        db.session.delete(favorite)
+        db.session.commit()
+        return jsonify({"message": "Product removed from favorites"})
+    return jsonify({"message": "Product not found in favorites"}), 404
 
 if __name__ == '__main__':
-    app.run(debug=True)
+    app
