@@ -1,6 +1,10 @@
 from flask import Blueprint, jsonify, request
 from ..models import ProductImage
 from ..extensions import db
+from flask_wtf import FlaskForm
+from flask_wtf.file import FileField, FileAllowed, FileRequired
+from wtforms import SubmitField
+from app.routes.aws_helpers import ALLOWED_EXTENSIONS
 
 images_bp = Blueprint('images', __name__)
 
